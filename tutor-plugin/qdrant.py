@@ -1,0 +1,17 @@
+from tutor import hooks
+
+hooks.Filters.ENV_PATCHES.add_item(
+    (
+        "local-docker-compose-services",
+        """
+qdrant:
+  image: qdrant/qdrant:latest
+  container_name: tutor_local_qdrant
+  restart: unless-stopped
+  ports:
+    - "6333:6333"
+  volumes:
+    - ../data/qdrant:/qdrant/storage
+"""
+    )
+)
