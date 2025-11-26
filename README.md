@@ -116,7 +116,7 @@ Since we are a team, we never push directly to the main branch. We use "Feature 
 
 1. Start a New Task
 Before you write any code, get the latest updates and create a new branch.
-'''
+```
 Bash
 
 # 1. Update your local project
@@ -126,11 +126,12 @@ git pull origin main
 # 2. Create a new branch named after your task
 # Example: git checkout -b feature/streamlit-ui
 git checkout -b feature/<your-feature-name>
+```
 2. Save Your Work (Commit)
 You did some coding. Now save it.
-'''
-'''
-Bash
+
+
+```Bash
 
 # See what files you changed
 git status
@@ -140,14 +141,15 @@ git add .
 
 # Save with a message (Be descriptive!)
 git commit -m "Added the basic UI layout for the chat app"
+```
 3. Share Your Work (Push)
 Send your branch to GitHub.
-'''
-'''
+
+```
 Bash
 
 git push -u origin feature/<your-feature-name>
-'''
+```
 4. Merge (Pull Request)
 Go to our GitHub Repository.
 
