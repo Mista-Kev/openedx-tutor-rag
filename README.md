@@ -47,21 +47,21 @@ You don’t need to be a Docker/Tutor expert. You just need these installed:
 ## 3. Setup - Getting the code on your machine
 	1.	Go to the repo on GitHub and copy the clone URL (HTTPS is easiest).
 	2.	In a terminal:
-		```bash
+		```
 		git clone <repo-url>
 		cd openedx-tutor-rag
 		```
     3. Create a virtual environment and activate it:
-		```bash
+		```
 		uv venv
 		source .venv/bin/activate
 		```
     4. Install dependencies:
-		```bash
+		```
 		uv sync
 		```
     5. Every time you want to work on the project, activate the virtual environment:
-		```bash
+		```
         cd <repo-name>
 		source .venv/bin/activate
 		```
@@ -72,7 +72,7 @@ Only do this if you have a Mac/Linux machine with 16GB RAM and are responsible f
 
 1. Install the Qdrant Plugin: We need to tell Tutor where our custom plugin file is.
 
-```bash
+```
 # 1. Ask Tutor where plugins live
 DESTINATION=$(uv run tutor plugins printroot)
 
@@ -88,11 +88,11 @@ uv run tutor plugins enable qdrant
 By default, Tutor uses a special domain `local.overhang.io` that points to your computer. This usually works out of the box.
 
 1. Configure Tutor (accepting defaults):
-   ```bash
+   ```
    uv run tutor config save --non-interactive
    ```
 2. Launch the platform:
-   ```bash
+   ```
    uv run tutor local launch
    ```
    - Open edX will be at: **http://local.overhang.io**
@@ -102,11 +102,11 @@ By default, Tutor uses a special domain `local.overhang.io` that points to your 
 If the URL above doesn't work (or you have DNS issues), you can force it to use `localhost`.
 
 1. Configure Tutor to use localhost explicitly:
-   ```bash
+   ```
    uv run tutor config save --set LMS_HOST=localhost --set CMS_HOST=localhost
    ```
 2. Launch the platform:
-   ```bash
+   ```
    uv run tutor local launch
    ```
    - Open edX will be at: **http://localhost**
@@ -117,7 +117,7 @@ Since we are a team, we never push directly to the main branch. We use "Feature 
 1. Start a New Task
 Before you write any code, get the latest updates and create a new branch.
 ```
-Bash
+
 
 # 1. Update your local project
 git checkout main
@@ -131,8 +131,7 @@ git checkout -b feature/<your-feature-name>
 You did some coding. Now save it.
 
 
-```Bash
-
+```
 # See what files you changed
 git status
 
@@ -142,11 +141,12 @@ git add .
 # Save with a message (Be descriptive!)
 git commit -m "Added the basic UI layout for the chat app"
 ```
+
 3. Share Your Work (Push)
 Send your branch to GitHub.
 
 ```
-Bash
+
 
 git push -u origin feature/<your-feature-name>
 ```
