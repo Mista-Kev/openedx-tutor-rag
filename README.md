@@ -70,18 +70,18 @@ You don’t need to be a Docker/Tutor expert. You just need these installed:
 
 Only do this if you have a Mac/Linux machine with 16GB RAM and are responsible for running Open edX.
 
-1. Install the Qdrant Plugin: We need to tell Tutor where our custom plugin file is.
+1. Install the Qdrant Plugin: The plugin is created using the Tutor cookiecutter template and needs to be installed as a Python package.
 
 ```
-# 1. Ask Tutor where plugins live
-DESTINATION=$(uv run tutor plugins printroot)
+# Install the plugin in development mode (from the qdrant_rag directory)
+cd qdrant_rag
+uv pip install -e .
 
-# 2. Link our file to that location
-ln -s "$(pwd)/tutor-plugin/qdrant.py" "$DESTINATION/qdrant.py"
-
-# 3. Enable it
+# Enable the plugin
 uv run tutor plugins enable qdrant
 ```
+
+**Note:** The plugin structure `qdrant_rag/qdrant_rag/plugin.py` is correct for a Tutor cookiecutter plugin. The plugin is registered via the entry point `qdrant = "qdrant_rag.plugin"` in `pyproject.toml`, which Tutor will automatically discover once the package is installed.
 2. Launch Open edX with Tutor:
 
 ### Option A: The Standard Way
@@ -98,18 +98,26 @@ By default, Tutor uses a special domain `local.overhang.io` that points to your 
    - Open edX will be at: **http://local.overhang.io**
    - Qdrant will be at: **http://localhost:6333/dashboard**
 
-### Option B: The "Localhost" Workaround
-If the URL above doesn't work (or you have DNS issues), you can force it to use `localhost`.
-
-1. Configure Tutor to use localhost explicitly:
+3. Stopping the Platform:
+   To stop the containers without losing data:
+   ```bash
+   uv run tutor local stop
    ```
-   uv run tutor config save --set LMS_HOST=localhost --set CMS_HOST=localhost
+
+### Option B: The "Localhost" Workaround (If Option A fails)
+If `local.overhang.io` doesn't work (e.g., due to DNS issues), use this method. It uses `*.localhost` domains which are automatically resolved by most browsers.
+
+1. Configure Tutor to use `lms.localhost` and `studio.localhost`:
+   ```bash
+   uv run tutor config save --set LMS_HOST=lms.localhost --set CMS_HOST=studio.localhost
    ```
 2. Launch the platform:
-   ```
+   ```bash
    uv run tutor local launch
    ```
-   - Open edX will be at: **http://localhost**
+   - Open edX will be at: **http://lms.localhost**
+   - Studio will be at: **http://studio.localhost**
+   - Qdrant will be at: **http://localhost:6333/dashboard**
 
 ## 5. Github Workflow (How to contribute)
 Since we are a team, we never push directly to the main branch. We use "Feature Branches."
