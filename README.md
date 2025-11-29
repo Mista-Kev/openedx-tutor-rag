@@ -105,7 +105,7 @@ By default, Tutor uses a special domain `local.overhang.io` that points to your 
    ```
 
 ### Option B: The "Localhost" Workaround (If Option A fails)
-If `local.overhang.io` doesn't work (e.g., due to DNS issues), use this method. It uses `*.localhost` domains which are automatically resolved by most browsers.
+If `local.overhang.io` doesn't work (e.g., due to DNS issues) **or if you see a blank white screen when trying to access the LMS**, use this method. It uses `*.localhost` domains which are automatically resolved by most browsers.
 
 1. Configure Tutor to use `lms.localhost` and `studio.localhost`:
    ```bash
