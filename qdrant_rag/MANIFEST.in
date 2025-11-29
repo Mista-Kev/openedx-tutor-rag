@@ -1,0 +1,2 @@
+recursive-include qdrant_rag/patches *
+recursive-include qdrant_rag/templates *

@@ -1,0 +1,65 @@
+# https://packaging.python.org/en/latest/tutorials/packaging-projects/
+# https://hatch.pypa.io/latest/config/build/
+
+[project]
+name = "qdrant_rag"
+description = "a plugin to run qdrant vector db"
+authors = [
+  { name = "Kevin van Heck"},
+  { email = "kev.vanheck@gmail.com" },
+]
+license = { text = "AGPL-3.0-only" }
+
+readme = {file = "README.rst", content-type = "text/x-rst"}
+requires-python = ">= 3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+
+]
+dependencies = [
+    "tutor>=20.0.0,<21.0.0",
+]
+
+# These fields will be set by hatch_build.py
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "tutor[dev]>=20.0.0,<21.0.0",
+    "ruff",
+]
+
+[tool.hatch.version]
+path = "qdrant_rag/__about__.py"
+
+# https://packaging.python.org/en/latest/specifications/well-known-project-urls/#well-known-labels
+[project.urls]
+Documentation = "https://github.com/Mista-Kev/openedx-tutor-rag.git#readme"
+Issues = "https://github.com/Mista-Kev/openedx-tutor-rag.git/issues"
+Source = "https://github.com/Mista-Kev/openedx-tutor-rag.git"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["qdrant_rag"]
+
+[tool.hatch.build.targets.sdist]
+# Disable strict naming, otherwise twine is not able to detect name/version
+strict-naming = false
+include = [ "/qdrant_rag"]
+exclude = ["tests*"]
+
+[project.entry-points."tutor.plugin.v1"]
+qdrant = "qdrant_rag.plugin"
