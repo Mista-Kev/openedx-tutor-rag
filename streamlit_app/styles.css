@@ -1,0 +1,26 @@
+/* === TEST: make it obvious CSS is loaded === */
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #f8fafc !important;   /* very light grey-blue */
+}
+
+/* === Style the chat input pill (st.chat_input) === */
+div[data-testid="stChatInput"] > div {
+    border-radius: 999px !important;
+    border: 2px solid #dde1e7 !important;   /* default idle border */
+}
+
+/* Remove browser focus outline */
+div[data-testid="stChatInput"] input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Override the red focus border */
+div[data-testid="stChatInput"] > div:focus-within {
+    border-color: #4b4b4b !important;        /* your grey */
+    box-shadow: 0 0 0 2px rgba(75, 75, 75, 0.15) !important;
+}
+
+div[data-testid="stPills"] button {
+    color: #8fb5ff !important;
+}
