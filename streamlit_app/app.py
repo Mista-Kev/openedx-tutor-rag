@@ -1,14 +1,20 @@
 import streamlit as st
-from streamlit_app.backend import query_rag_backend
-# ---- Page config ----
+from backend import query_rag_backend
+
+from ui import render_app
+
+if __name__ == "__main__":
+    render_app()
+
+# ---- config ----
 st.set_page_config(
-    page_title="RAG UI",
-    page_icon="📚",
+    page_title="OpenEdX Insights",
+    page_icon="👾",
     layout="wide",
 )
 
 # ---- Title + description ----
-st.title("RAG UI – Qdrant + Open edX")
+st.title("Ask a question to explore your Open edX content")
 st.write(
     "Prototype interface to test retrieval-augmented generation "
     "using the Qdrant plugin."
