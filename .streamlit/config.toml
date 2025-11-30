@@ -1,0 +1,8 @@
+
+
+[theme]
+primaryColor = "#81B3FA"          # GUDS blue
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F7FB"
+textColor = "#202531"
+font = "sans serif"

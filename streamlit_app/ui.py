@@ -7,11 +7,7 @@ import textwrap
 import time
 import pathlib
 import streamlit as st
-
 from backend import query_rag_backend
-
-# -----------------------------------------------------------------------------
-# Global setup
 
 st.set_page_config(page_title="OpenEdX Insights", page_icon="👾")
 
@@ -19,8 +15,6 @@ def load_css():
     css_path = pathlib.Path(__file__).parent / "styles.css"
     css = css_path.read_text()
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
-
-load_css()
 
 # Default settings when sidebar is hidden
 top_k = 5
@@ -112,6 +106,7 @@ def show_disclaimer_dialog():
 
 
 def render_app() -> None:
+    load_css()
     # ----- Title row -----
     title_row = st.container(
         horizontal=True,
