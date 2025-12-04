@@ -28,6 +28,12 @@ classifiers = [
 ]
 dependencies = [
     "tutor>=20.0.0,<21.0.0",
+    "pymongo",
+    "llama-index",
+    "llama-index-vector-stores-qdrant",
+    "llama-index-embeddings-fastembed",
+    "fastembed",
+    "qdrant-client",
 ]
 
 # These fields will be set by hatch_build.py

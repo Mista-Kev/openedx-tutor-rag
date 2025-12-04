@@ -119,7 +119,65 @@ If `local.overhang.io` doesn't work (e.g., due to DNS issues) **or if you see a 
    - Studio will be at: **http://studio.localhost**
    - Qdrant will be at: **http://localhost:6333/dashboard**
 
-## 5. Github Workflow (How to contribute)
+## 5. Data Extraction (RAG Pipeline)
+
+The extraction script (`extraction.py`) does the heavy lifting: it pulls course content from Open edX's MongoDB, processes it, and indexes it into Qdrant.
+
+### What the script does
+
+1. **Connects to MongoDB** - Uses the `openedx` database inside the Docker network
+2. **Reads Split Mongo collections** - Open edX stores courses across three collections:
+   - `modulestore.active_versions`: which version of each course is published
+   - `modulestore.structures`: the course tree (chapters → sections → units → blocks)
+   - `modulestore.definitions`: the actual content (HTML, video info, etc.)
+3. **Extracts content blocks** - Pulls HTML text, problem questions, and video transcripts
+4. **Cleans the data** - Strips HTML tags, cleans SRT timestamps from transcripts
+5. **Indexes to Qdrant** - Uses LlamaIndex to chunk text, generate embeddings (FastEmbed), and store vectors
+
+### Running the extraction
+
+Since the script needs access to the internal Docker network, run it inside the LMS container:
+
+```bash
+# Make sure Open edX is running
+uv run tutor local start -d
+
+# Copy the files to the container
+docker cp qdrant_rag/qdrant_rag/config.py tutor_local-lms-1:/tmp/config.py
+docker cp qdrant_rag/qdrant_rag/extraction.py tutor_local-lms-1:/tmp/extraction.py
+
+# Run the extraction
+uv run tutor local exec lms python /tmp/extraction.py
+```
+
+You should see output like:
+```
+Connecting to MongoDB...
+   Host: mongodb://mongodb:27017
+Connected!
+Found 2 courses
+
+Extracting: course-v1:edX+DemoX+Demo_Course
+   Fetching 42 definitions...
+   Extracted 15 content blocks
+
+Total documents extracted: 15
+
+==================================================
+Indexing to Qdrant
+==================================================
+Loading embedding model (bge-small-en)...
+Processing 15 documents...
+Done! Documents are now in Qdrant.
+```
+
+### Verify it worked
+
+Check Qdrant's dashboard to see your indexed documents:
+- Open **http://localhost:6333/dashboard**
+- Look for the `openedx_courses` collection
+
+## 6. Github Workflow (How to contribute)
 Since we are a team, we never push directly to the main branch. We use "Feature Branches."
 
 1. Start a New Task
@@ -171,3 +229,11 @@ Wait for a teammate to review or approve, then click Merge.
 
 Done! Now everyone else can pull your code into their main branch, and you can repeat from step 1 and open a new feature branch.
 
+## 7. References & Documentation
+
+This project follows official patterns from:
+
+- **LlamaIndex + Qdrant**: [Official LlamaIndex Qdrant Guide](https://docs.llamaindex.ai/en/stable/examples/vector_stores/QdrantIndexDemo/)
+- **FastEmbed**: [Qdrant FastEmbed Docs](https://qdrant.github.io/fastembed/) - Local embeddings, no API keys needed
+- **Open edX Modulestore**: [Split Mongo Documentation](https://docs.openedx.org/projects/edx-platform/en/latest/references/docs/xmodule/modulestore/docs/split-mongo.html) - How Open edX stores course data
+- **Tutor Configuration**: [Tutor Docs](https://docs.tutor.edly.io/configuration.html) - MongoDB and service settings
