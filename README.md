@@ -177,7 +177,50 @@ Check Qdrant's dashboard to see your indexed documents:
 - Open **http://localhost:6333/dashboard**
 - Look for the `openedx_courses` collection
 
-## 6. Github Workflow (How to contribute)
+## 6. Using the RAG System
+
+Once you've extracted course content into Qdrant, you can query it using either the Streamlit web app or the command-line interface.
+
+### Environment Setup
+
+Create a `.env` file in the project root with your API keys:
+
+```
+QDRANT_URL=http://localhost:6333
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+You can get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey).
+
+### Running the Streamlit App
+
+The web interface is the easiest way to interact with the RAG system:
+
+```bash
+# From the project root
+uv run streamlit run streamlit_app/app.py
+```
+
+This opens a browser where you can type questions about your course content.
+
+### Running the CLI
+
+For a simpler terminal-based interface:
+
+```bash
+uv run python cli_qa.py
+```
+
+Type your question and press Enter. Type `exit` or `quit` to stop.
+
+### How it works
+
+1. Your question gets embedded using the same model used during extraction (bge-small-en)
+2. Qdrant finds the 10 most relevant course chunks
+3. Those chunks are sent to Gemini along with your question
+4. Gemini generates an answer based on the actual course content
+
+## 7. Github Workflow (How to contribute)
 Since we are a team, we never push directly to the main branch. We use "Feature Branches."
 
 1. Start a New Task
@@ -229,7 +272,7 @@ Wait for a teammate to review or approve, then click Merge.
 
 Done! Now everyone else can pull your code into their main branch, and you can repeat from step 1 and open a new feature branch.
 
-## 7. References & Documentation
+## 8. References & Documentation
 
 This project follows official patterns from:
 
