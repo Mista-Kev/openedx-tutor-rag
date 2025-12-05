@@ -35,7 +35,7 @@ def get_embedding_model(
                 "llama-index-embeddings-fastembed are not installed or not compatible."
             ) from e
 
-        return FastEmbedEmbedding()
+        return FastEmbedEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
     elif backend == "huggingface":
         return HuggingFaceEmbedding(
