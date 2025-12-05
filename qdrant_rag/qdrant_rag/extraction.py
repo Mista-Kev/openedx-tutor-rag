@@ -225,8 +225,10 @@ class OpenEdXExtractor:
         for doc in self.definitions.find({"_id": {"$in": def_ids}}):
             definitions[doc["_id"]] = doc
 
-        # now extract content from each block
-        skip_types = ["course", "chapter", "sequential", "vertical"]
+        # structural blocks - we want their names for navigation/search
+        structural_types = ["chapter", "sequential"]
+        # blocks we skip entirely
+        skip_types = ["course", "vertical"]
 
         for block in blocks:
             block_type = block.get("block_type", "")
@@ -234,13 +236,41 @@ class OpenEdXExtractor:
             if block_type in skip_types:
                 continue
 
+            # get display_name from block or definition fields
+            block_fields = block.get("fields", {})
+            def_id = block.get("definition")
+            def_fields = definitions.get(def_id, {}).get("fields", {}) if def_id else {}
+
+            display_name = (
+                block_fields.get("display_name") or
+                def_fields.get("display_name") or
+                "Untitled"
+            )
+
+            # for structural blocks (chapters/sections), use the title as content
+            if block_type in structural_types:
+                if display_name and display_name != "Untitled":
+                    # create a document with the section/module name
+                    section_type = "Module" if block_type == "chapter" else "Section"
+                    content = f"{section_type}: {display_name}"
+
+                    doc = Document(
+                        text=content,
+                        metadata={
+                            "course_id": course_id,
+                            "block_type": block_type,
+                            "display_name": display_name,
+                            "source": f"{course_id}/{block_type}/{display_name}",
+                        }
+                    )
+                    documents.append(doc)
+                continue
+
+            # for content blocks, extract the actual content
             content = self._extract_content(block, definitions)
 
             # only keep blocks with substantial content
             if content and len(content) > 50:
-                fields = block.get("fields", {})
-                display_name = fields.get("display_name", "Untitled")
-
                 doc = Document(
                     text=content,
                     metadata={
