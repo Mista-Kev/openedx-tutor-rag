@@ -1,0 +1,81 @@
+
+/* Use Blinker for general text */
+body,
+h1, h2, h3, h4, h5, h6,
+[data-testid="stAppViewContainer"] p,
+[data-testid="stAppViewContainer"] button,
+[data-testid="stAppViewContainer"] input,
+[data-testid="stAppViewContainer"] textarea,
+[data-testid="stAppViewContainer"] label,
+[data-testid="stAppViewContainer"] li {
+    font-family: 'Blinker', system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif !important;
+}
+
+/* Keep the correct font for Material / Streamlit icons */
+span[class*="material-icons"],
+span[class*="material-symbols"] {
+    font-family: "Material Symbols Outlined", "Material Symbols Rounded",
+                 "Material Icons", sans-serif !important;
+}
+
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #FFFFFF !important;   /* white */
+}
+
+/* Title in Blinker Regular (400) */
+h1 {
+    font-family: 'Blinker', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* === Style the chat input pill (st.chat_input) === */
+div[data-testid="stChatInput"] > div {
+    border-radius: 999px !important;
+    border: 2px solid #dde1e7 !important;   /* default idle border */
+}
+
+/* Remove browser focus outline */
+div[data-testid="stChatInput"] input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Override the red focus border */
+div[data-testid="stChatInput"] > div:focus-within {
+    border-color: #4b4b4b !important;        /* your grey */
+    box-shadow: 0 0 0 2px rgba(75, 75, 75, 0.15) !important;
+}
+
+div[data-testid="stPills"] button {
+    color: #8fb5ff !important;
+}
+
+/* Use Blinker for main text in the app */
+[data-testid="stAppViewContainer"] h1,
+[data-testid="stAppViewContainer"] h2,
+[data-testid="stAppViewContainer"] h3,
+[data-testid="stAppViewContainer"] h4,
+[data-testid="stAppViewContainer"] h5,
+[data-testid="stAppViewContainer"] h6,
+[data-testid="stAppViewContainer"] p,
+[data-testid="stAppViewContainer"] div,
+[data-testid="stAppViewContainer"] label,
+[data-testid="stAppViewContainer"] button,
+[data-testid="stAppViewContainer"] input,
+[data-testid="stAppViewContainer"] textarea {
+    font-family: 'Blinker', system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif !important;
+}
+
+/* Title in Blinker Regular (400) */
+[data-testid="stAppViewContainer"] h1 {
+    font-weight: 400 !important;
+}
+
+/* Keep proper font for Material icons */
+[data-testid="stAppViewContainer"] span[class*="material-icons"],
+[data-testid="stAppViewContainer"] span[class*="material-symbols"] {
+    font-family: "Material Symbols Outlined", "Material Symbols Rounded",
+                 "Material Icons", sans-serif !important;
+}

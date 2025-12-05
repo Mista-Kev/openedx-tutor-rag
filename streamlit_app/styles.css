@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Blinker:wght@300;400;600&display=swap');
+
+[data-testid="stAppViewContainer"] h1,
+[data-testid="stAppViewContainer"] p,
+[data-testid="stAppViewContainer"] div,
+[data-testid="stAppViewContainer"] button,
+[data-testid="stAppViewContainer"] input {
+    font-family: 'Blinker', system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif !important;
+}
+
+[data-testid="stAppViewContainer"] h1 {
+    font-weight: 400 !important;
+}
+
+
+/* Style the chat input  */
+div[data-testid="stChatInput"] > div {
+    border-radius: 999px !important;
+    border: 2px solid #DBDFE2 !important;   /* default idle border */
+}
+
+/* Remove browser focus outline */
+div[data-testid="stChatInput"] input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Override the red focus border */
+div[data-testid="stChatInput"] > div:focus-within {
+    border-color: #81B3FA !important;        /* your grey */
+    box-shadow: 0 0 0 2px rgba(75, 75, 75, 0.15) !important;
+}
+
+/*  "Legal disclaimer" button    */
+
+.stButton button:hover,
+.stButton button:hover * {
+    color: #81B3FA !important;
+}
+
+
+
