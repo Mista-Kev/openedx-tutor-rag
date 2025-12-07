@@ -33,7 +33,21 @@ class QAService:
         if not docs:
             context_text = "No relevant documents were retrieved from the knowledge base."
         else:
-            parts: List[str] = [d["text"] for d in docs]
+            # format each chunk with its metadata so the LLM understands the structure
+            parts: List[str] = []
+            for d in docs:
+                meta = d.get("metadata", {})
+                block_type = meta.get("block_type", "unknown")
+                display_name = meta.get("display_name", "")
+
+                # add a header showing what type of content this is
+                if display_name:
+                    header = f"[{block_type}: {display_name}]"
+                else:
+                    header = f"[{block_type}]"
+
+                parts.append(f"{header}\n{d['text']}")
+
             context_text = "\n\n---\n\n".join(parts)
 
 
