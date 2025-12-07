@@ -39,14 +39,22 @@ class QAService:
                 meta = d.get("metadata", {})
                 block_type = meta.get("block_type", "unknown")
                 display_name = meta.get("display_name", "")
+                module = meta.get("module", "")
+                section = meta.get("section", "")
 
-                # add a header showing what type of content this is
+                # build a header showing the hierarchy
+                header_parts = []
+                if module:
+                    header_parts.append(f"Module: {module}")
+                if section:
+                    header_parts.append(f"Section: {section}")
                 if display_name:
-                    header = f"[{block_type}: {display_name}]"
+                    header_parts.append(f"{block_type}: {display_name}")
                 else:
-                    header = f"[{block_type}]"
+                    header_parts.append(f"{block_type}")
 
-                parts.append(f"{header}\n{d['text']}")
+                header = " > ".join(header_parts) if header_parts else block_type
+                parts.append(f"[{header}]\n{d['text']}")
 
             context_text = "\n\n---\n\n".join(parts)
 
