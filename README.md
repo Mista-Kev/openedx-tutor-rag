@@ -226,8 +226,6 @@ Since we are a team, we never push directly to the main branch. We use "Feature 
 1. Start a New Task
 Before you write any code, get the latest updates and create a new branch.
 ```
-
-
 # 1. Update your local project
 git checkout main
 git pull origin main
