@@ -253,8 +253,6 @@ git commit -m "Added the basic UI layout for the chat app"
 Send your branch to GitHub.
 
 ```
-
-
 git push -u origin feature/<your-feature-name>
 ```
 4. Merge (Pull Request)
