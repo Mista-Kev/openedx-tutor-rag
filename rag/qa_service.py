@@ -13,7 +13,7 @@ class QAService:
         qdrant_host: str = "localhost",
         qdrant_port: int = 6333,
         collection_name: str = "openedx_courses",
-        top_k: int = 10,
+        top_k: int = 40,  # increased for better coverage on overview questions
         embedding_backend: str | None = None,  # "fastembed" / "huggingface" / None
     ):
         # main retriever

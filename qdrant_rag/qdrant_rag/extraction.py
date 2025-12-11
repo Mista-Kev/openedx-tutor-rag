@@ -242,6 +242,16 @@ class OpenEdXExtractor:
         for doc in self.definitions.find({"_id": {"$in": def_ids}}):
             definitions[doc["_id"]] = doc
 
+        # helper to resolve child references - they can be strings or lists
+        def get_block(child_ref):
+            if isinstance(child_ref, str):
+                return blocks.get(child_ref)
+            elif isinstance(child_ref, list) and len(child_ref) >= 2:
+                # format might be ["block_type", "block_id"] or similar
+                # try the last element as block_id
+                return blocks.get(child_ref[-1])
+            return None
+
         # find the course root block to start traversal
         root_block = None
         for block_id, block in blocks.items():
@@ -257,8 +267,8 @@ class OpenEdXExtractor:
         # we track the current module and section as we go down
         chapters = root_block.get("fields", {}).get("children", [])
 
-        for chapter_id in chapters:
-            chapter = blocks.get(chapter_id)
+        for chapter_ref in chapters:
+            chapter = get_block(chapter_ref)
             if not chapter or chapter.get("block_type") != "chapter":
                 continue
 
@@ -281,8 +291,8 @@ class OpenEdXExtractor:
             # now get the sections (sequentials) within this chapter
             sequentials = chapter.get("fields", {}).get("children", [])
 
-            for seq_id in sequentials:
-                sequential = blocks.get(seq_id)
+            for seq_ref in sequentials:
+                sequential = get_block(seq_ref)
                 if not sequential or sequential.get("block_type") != "sequential":
                     continue
 
@@ -307,16 +317,16 @@ class OpenEdXExtractor:
                 # get the verticals (units) within this section
                 verticals = sequential.get("fields", {}).get("children", [])
 
-                for vert_id in verticals:
-                    vertical = blocks.get(vert_id)
+                for vert_ref in verticals:
+                    vertical = get_block(vert_ref)
                     if not vertical or vertical.get("block_type") != "vertical":
                         continue
 
                     # get the content blocks within this vertical
                     content_blocks = vertical.get("fields", {}).get("children", [])
 
-                    for content_id in content_blocks:
-                        content_block = blocks.get(content_id)
+                    for content_ref in content_blocks:
+                        content_block = get_block(content_ref)
                         if not content_block:
                             continue
 
