@@ -13,7 +13,7 @@ class QAService:
         qdrant_host: str = "localhost",
         qdrant_port: int = 6333,
         collection_name: str = "openedx_courses",
-        top_k: int = 5,
+        top_k: int = 40,  # increased for better coverage on overview questions
         embedding_backend: str | None = None,  # "fastembed" / "huggingface" / None
     ):
         # main retriever
@@ -33,7 +33,29 @@ class QAService:
         if not docs:
             context_text = "No relevant documents were retrieved from the knowledge base."
         else:
-            parts: List[str] = [d["text"] for d in docs]
+            # format each chunk with its metadata so the LLM understands the structure
+            parts: List[str] = []
+            for d in docs:
+                meta = d.get("metadata", {})
+                block_type = meta.get("block_type", "unknown")
+                display_name = meta.get("display_name", "")
+                module = meta.get("module", "")
+                section = meta.get("section", "")
+
+                # build a header showing the hierarchy
+                header_parts = []
+                if module:
+                    header_parts.append(f"Module: {module}")
+                if section:
+                    header_parts.append(f"Section: {section}")
+                if display_name:
+                    header_parts.append(f"{block_type}: {display_name}")
+                else:
+                    header_parts.append(f"{block_type}")
+
+                header = " > ".join(header_parts) if header_parts else block_type
+                parts.append(f"[{header}]\n{d['text']}")
+
             context_text = "\n\n---\n\n".join(parts)
 
 

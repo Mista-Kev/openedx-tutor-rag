@@ -1,5 +1,8 @@
 # cli_qa.py
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from rag.qa_service import QAService
 
 

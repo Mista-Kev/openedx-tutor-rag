@@ -199,12 +199,24 @@ class OpenEdXExtractor:
 
         return ""
 
+    def _get_display_name(self, block: dict, definitions: dict) -> str:
+        """Helper to get display_name from block or definition fields."""
+        block_fields = block.get("fields", {})
+        def_id = block.get("definition")
+        def_fields = definitions.get(def_id, {}).get("fields", {}) if def_id else {}
+
+        return (
+            block_fields.get("display_name") or
+            def_fields.get("display_name") or
+            "Untitled"
+        )
+
     def extract_course(self, course_id: str) -> list[Document]:
         """
         Extract all content from a course and return LlamaIndex Documents.
 
-        We skip structural blocks (course, chapter, sequential, vertical) since
-        they don't contain actual content - they're just containers.
+        We traverse the course tree to track hierarchy - so each section knows
+        its parent module, and each content block knows its module and section.
         """
         print(f"\nExtracting: {course_id}")
         documents = []
@@ -213,44 +225,134 @@ class OpenEdXExtractor:
         if not structure:
             return documents
 
-        # get all the blocks from the structure
-        blocks = structure.get("blocks", [])
+        # get all the blocks and build a lookup map by block_id
+        blocks = structure.get("blocks", {})
+
+        # in Split Mongo, blocks is a dict keyed by block_id
+        # each block has "fields" with "children" listing child block_ids
+        if isinstance(blocks, list):
+            # handle older list format just in case
+            blocks = {b.get("block_id"): b for b in blocks}
 
         # collect all definition IDs so we can fetch them in one query
-        # (much faster than querying one at a time)
-        def_ids = [b["definition"] for b in blocks if "definition" in b]
+        def_ids = [b["definition"] for b in blocks.values() if "definition" in b]
 
         print(f"   Fetching {len(def_ids)} definitions...")
         definitions = {}
         for doc in self.definitions.find({"_id": {"$in": def_ids}}):
             definitions[doc["_id"]] = doc
 
-        # now extract content from each block
-        skip_types = ["course", "chapter", "sequential", "vertical"]
+        # helper to resolve child references - they can be strings or lists
+        def get_block(child_ref):
+            if isinstance(child_ref, str):
+                return blocks.get(child_ref)
+            elif isinstance(child_ref, list) and len(child_ref) >= 2:
+                # format might be ["block_type", "block_id"] or similar
+                # try the last element as block_id
+                return blocks.get(child_ref[-1])
+            return None
 
-        for block in blocks:
-            block_type = block.get("block_type", "")
+        # find the course root block to start traversal
+        root_block = None
+        for block_id, block in blocks.items():
+            if block.get("block_type") == "course":
+                root_block = block
+                break
 
-            if block_type in skip_types:
+        if not root_block:
+            print("   Could not find course root block")
+            return documents
+
+        # traverse the tree: course -> chapters -> sequentials -> verticals -> content
+        # we track the current module and section as we go down
+        chapters = root_block.get("fields", {}).get("children", [])
+
+        for chapter_ref in chapters:
+            chapter = get_block(chapter_ref)
+            if not chapter or chapter.get("block_type") != "chapter":
                 continue
 
-            content = self._extract_content(block, definitions)
+            module_name = self._get_display_name(chapter, definitions)
 
-            # only keep blocks with substantial content
-            if content and len(content) > 50:
-                fields = block.get("fields", {})
-                display_name = fields.get("display_name", "Untitled")
-
+            # create a document for the module itself
+            if module_name and module_name != "Untitled":
                 doc = Document(
-                    text=content,
+                    text=f"Module: {module_name}",
                     metadata={
                         "course_id": course_id,
-                        "block_type": block_type,
-                        "display_name": display_name,
-                        "source": f"{course_id}/{block_type}/{display_name}",
+                        "block_type": "chapter",
+                        "display_name": module_name,
+                        "module": module_name,
+                        "source": f"{course_id}/chapter/{module_name}",
                     }
                 )
                 documents.append(doc)
+
+            # now get the sections (sequentials) within this chapter
+            sequentials = chapter.get("fields", {}).get("children", [])
+
+            for seq_ref in sequentials:
+                sequential = get_block(seq_ref)
+                if not sequential or sequential.get("block_type") != "sequential":
+                    continue
+
+                section_name = self._get_display_name(sequential, definitions)
+
+                # create a document for the section, including its parent module
+                if section_name and section_name != "Untitled":
+                    content = f"Section: {section_name} (in {module_name})"
+                    doc = Document(
+                        text=content,
+                        metadata={
+                            "course_id": course_id,
+                            "block_type": "sequential",
+                            "display_name": section_name,
+                            "module": module_name,
+                            "section": section_name,
+                            "source": f"{course_id}/sequential/{section_name}",
+                        }
+                    )
+                    documents.append(doc)
+
+                # get the verticals (units) within this section
+                verticals = sequential.get("fields", {}).get("children", [])
+
+                for vert_ref in verticals:
+                    vertical = get_block(vert_ref)
+                    if not vertical or vertical.get("block_type") != "vertical":
+                        continue
+
+                    # get the content blocks within this vertical
+                    content_blocks = vertical.get("fields", {}).get("children", [])
+
+                    for content_ref in content_blocks:
+                        content_block = get_block(content_ref)
+                        if not content_block:
+                            continue
+
+                        block_type = content_block.get("block_type", "")
+
+                        # skip structural blocks
+                        if block_type in ["course", "chapter", "sequential", "vertical"]:
+                            continue
+
+                        content = self._extract_content(content_block, definitions)
+                        display_name = self._get_display_name(content_block, definitions)
+
+                        # only keep blocks with substantial content
+                        if content and len(content) > 50:
+                            doc = Document(
+                                text=content,
+                                metadata={
+                                    "course_id": course_id,
+                                    "block_type": block_type,
+                                    "display_name": display_name,
+                                    "module": module_name,
+                                    "section": section_name,
+                                    "source": f"{course_id}/{block_type}/{display_name}",
+                                }
+                            )
+                            documents.append(doc)
 
         print(f"   Extracted {len(documents)} content blocks")
         return documents
