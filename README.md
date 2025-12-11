@@ -155,19 +155,19 @@ You should see output like:
 Connecting to MongoDB...
    Host: mongodb://mongodb:27017
 Connected!
-Found 2 courses
+Found 1 courses
 
-Extracting: course-v1:edX+DemoX+Demo_Course
-   Fetching 42 definitions...
-   Extracted 15 content blocks
+Extracting: course-v1:OpenedX+DemoX+DemoCourse
+   Fetching 413 definitions...
+   Extracted 197 content blocks
 
-Total documents extracted: 15
+Total documents extracted: 197
 
 ==================================================
 Indexing to Qdrant
 ==================================================
 Loading embedding model (bge-small-en)...
-Processing 15 documents...
+Processing 197 documents...
 Done! Documents are now in Qdrant.
 ```
 
